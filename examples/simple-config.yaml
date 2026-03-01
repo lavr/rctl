@@ -1,0 +1,24 @@
+version: 1
+
+clients:
+  mycompany:
+    domains:
+      vpn:
+        dir: "~/work/mycompany/vpn"
+        env:
+          VPN_PROFILE: "main"
+        profiles:
+          up:
+            cmd: "wg-quick"
+            args: ["up", "wg0"]
+          down:
+            cmd: "wg-quick"
+            args: ["down", "wg0"]
+      ansible:
+        dir: "~/work/mycompany/ansible"
+        env:
+          ANSIBLE_FORCE_COLOR: "1"
+        profiles:
+          ping:
+            cmd: "ansible"
+            args: ["all", "-m", "ping"]

@@ -1,0 +1,108 @@
+version: 1
+
+# Include additional config files
+includes:
+  - "~/.config/rctl/clients/*.yaml"
+
+# Global defaults applied to all clients/domains
+defaults:
+  env:
+    LANG: "C"
+  commands_path:
+    - "~/.local/share/rctl/commands"
+    - "/usr/local/share/rctl/commands"
+  policy:
+    deny_commands: ["rm", "dd"]
+    audit:
+      enabled: true
+      sink: "file"
+      file: "~/.local/state/rctl/audit.log"
+      redact_env_keys: ["*_TOKEN", "*PASSWORD*", "*SECRET*"]
+
+# Global template variables
+vars:
+  user: "{{ .Env.USER }}"
+
+# Global command aliases
+builtins:
+  kctx:
+    cmd: "kubectx"
+  kns:
+    cmd: "kubens"
+
+# Secret providers
+secrets:
+  providers:
+    env:
+      enabled: true
+    command:
+      enabled: true
+      commands:
+        op: "op read {{ .Path }}"
+        pass: "pass show {{ .Path }}"
+
+# Client definitions
+clients:
+  client1:
+    aliases: ["cl1"]
+    tags: ["prod", "corp"]
+    defaults:
+      env:
+        RCTL_CLIENT: "client1"
+      vars:
+        region: "ru"
+    domains:
+      vpn:
+        dir: "~/work/client1/vpn"
+        env:
+          VPN_ENV: "prod"
+          KUBECONFIG: "{{ .Dir }}/kube/{{ .Vars.region }}.yaml"
+        default_args: ["--verbose"]
+        profiles:
+          up:
+            cmd: "wg-up"
+            args: ["--profile", "main"]
+          down:
+            cmd: "wg-down"
+        aliases: ["v"]
+
+      vpn-staging:
+        extends: "vpn"
+        env:
+          VPN_ENV: "staging"
+
+      ansible:
+        dir: "~/work/client1/ansible"
+        env:
+          ANSIBLE_FORCE_COLOR: "1"
+        profiles:
+          ping:
+            cmd: "ansible"
+            args: ["all", "-m", "ping"]
+          deploy:
+            cmd: "ansible-playbook"
+            args: ["deploy.yml"]
+        aliases: ["ans"]
+
+  client2:
+    aliases: ["cl2"]
+    tags: ["staging"]
+    defaults:
+      env:
+        RCTL_CLIENT: "client2"
+      vars:
+        region: "us"
+    domains:
+      k8s:
+        dir: "~/work/client2/k8s"
+        env:
+          KUBECONFIG: "{{ .Dir }}/kubeconfig.yaml"
+        profiles:
+          apply:
+            cmd: "kubectl"
+            args: ["apply", "-f", "."]
+        policy:
+          allow_commands: ["kubectl", "helm", "apply"]
+          allow_path_prefixes:
+            - "/usr/local/bin/"
+            - "/opt/homebrew/bin/"
