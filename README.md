@@ -48,7 +48,7 @@ rctl client-a ansible deploy      # ansible-playbook with jump host already conf
 rctl a vpn down                   # via alias
 ```
 
-`rctl` handles `chdir`, sets env variables, substitutes arguments, and forwards the exit code.
+`rctl` handles `chdir`, sets env variables, substitutes arguments, forwards the exit code, and supports shell autocompletion.
 
 ## Features
 
