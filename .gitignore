@@ -1,6 +1,7 @@
 # Binaries
 /rctl
 /bin/
+/dist/
 *.exe
 
 # Go

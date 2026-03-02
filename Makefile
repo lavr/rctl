@@ -1,7 +1,7 @@
 VERSION ?= dev
 LDFLAGS := -ldflags "-X main.version=$(VERSION)"
 
-.PHONY: build test clean lint install
+.PHONY: build test clean lint install release
 
 build:
 	go build $(LDFLAGS) -o rctl ./cmd/rctl
@@ -21,3 +21,7 @@ lint:
 
 install:
 	VERSION=$(VERSION) ./scripts/install.sh
+
+release:
+	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=0.1.0" && exit 1)
+	./scripts/release.sh $(VERSION)
