@@ -11,7 +11,7 @@ DIST="dist"
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
-for pair in darwin/arm64 darwin/amd64; do
+for pair in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64; do
   OS="${pair%/*}"
   ARCH="${pair#*/}"
   GOOS=$OS GOARCH=$ARCH go build \
