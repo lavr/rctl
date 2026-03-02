@@ -66,11 +66,19 @@ rctl a vpn down                # via alias
 
 ## Installation
 
+### Homebrew
+
+```bash
+brew install lavr/tap/rctl
+```
+
+### Go
+
 ```bash
 go install github.com/lavr/rctl/cmd/rctl@latest
 ```
 
-From source:
+### From source
 
 ```bash
 git clone https://github.com/lavr/rctl.git
