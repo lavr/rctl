@@ -17,8 +17,8 @@ func Execute(version string) int {
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			app.SetupVerbose()
-			// Skip config loading for version command
-			if cmd.Name() == "version" {
+			// Skip config loading for commands that don't need it
+			if cmd.Name() == "version" || cmd.Name() == "completion" {
 				return nil
 			}
 			return app.LoadConfig()
