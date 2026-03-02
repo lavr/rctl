@@ -10,7 +10,7 @@ A typical workday:
 
 ```bash
 cd ~/work/client-a/vpn && VPN_PROFILE=main wg-quick up wg0
-cd ~/work/client-a/ansible && ANSIBLE_FORCE_COLOR=1 ansible all -m ping
+cd ~/work/client-a/ansible && ansible-playbook -i inventory deploy.yml --ssh-extra-args="-o ProxyJump=jump.client-a.net"
 cd ~/work/client-b/k8s && KUBECONFIG=./kubeconfig.yaml kubectl apply -f .
 ```
 
@@ -35,17 +35,17 @@ clients:
           down: { cmd: "wg-quick", args: ["down", "wg0"] }
       ansible:
         dir: "~/work/client-a/ansible"
-        env: { ANSIBLE_FORCE_COLOR: "1" }
+        default_args: ["--ssh-extra-args=-o ProxyJump=jump.client-a.net"]
         profiles:
-          ping: { cmd: "ansible", args: ["all", "-m", "ping"] }
+          deploy: { cmd: "ansible-playbook", args: ["-i", "inventory", "deploy.yml"] }
 ```
 
 Then just work:
 
 ```bash
-rctl client-a vpn up           # wg-quick up wg0 in ~/work/client-a/vpn
-rctl client-a ansible ping     # ansible all -m ping
-rctl a vpn down                # via alias
+rctl client-a vpn up              # wg-quick up wg0 in ~/work/client-a/vpn
+rctl client-a ansible deploy      # ansible-playbook with jump host already configured
+rctl a vpn down                   # via alias
 ```
 
 `rctl` handles `chdir`, sets env variables, substitutes arguments, and forwards the exit code.
