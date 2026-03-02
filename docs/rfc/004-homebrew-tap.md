@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Implemented (2026-03-02)
 
 ## Motivation
 
