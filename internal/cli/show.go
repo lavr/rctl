@@ -46,6 +46,14 @@ func showCmd(app *App) *cobra.Command {
 
 			eff := config.ComputeEffective(app.Cfg.Defaults, client.Defaults, domainCfg)
 
+			// Render templates (secret as no-op since show is read-only)
+			funcMap := config.DefaultFuncMap()
+			funcMap["secret"] = func(provider, path string) (string, error) { return "", nil }
+			ctx := config.NewTemplateContext(clientName, client.Tags, domainName, eff)
+			if err := config.RenderEffective(eff, ctx, funcMap); err != nil {
+				return fmt.Errorf("template rendering: %w", err)
+			}
+
 			if jsonFlag {
 				return printEffectiveJSON(app, clientName, domainName, eff)
 			}
